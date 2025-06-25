@@ -26,6 +26,10 @@ const ClientSchema = new mongoose.Schema({
 // Model
 const ClientModel = mongoose.model("ClientDetails", ClientSchema, "ClientDetails");
 
+
+app.get('/',(req,res)=>{
+  res.sendFile(path.join(__dirname,'index.html'));
+});
 // GET API Route
 app.get('/clientdet', async (req, res) => {
   try {
