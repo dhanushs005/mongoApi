@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -27,12 +26,8 @@ const ClientSchema = new mongoose.Schema({
 // Model
 const ClientModel = mongoose.model("ClientDetails", ClientSchema, "ClientDetails");
 
-
-app.get('/',(req,res)=>{
-  res.sendFile(path.join(__dirname,'index.html'));
-});
 // GET API Route
-app.get('/clientdet', async (req, res) => {
+app.get('/clientdetG', async (req, res) => {
   try {
     const data = await ClientModel.find();
     res.json(data);
@@ -41,6 +36,44 @@ app.get('/clientdet', async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Create
+app.post('/clientdetC', async (req, res)=>{
+  try{
+    const data = new ClientModel(req.body);
+    const SavedData= await data.save();
+    res.json(SavedData);
+  }catch(err){
+    res.status(500).json({error:err.message});
+  }
+});
+
+// Update
+app.put('/clientdetU/:id',async(req, res)=>{
+  try{
+    const updatedData = await ClientModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {new: true}
+    );
+    if(!updatedData) return res.status(404).json({error: 'Item not found'});
+    res.json(updatedData);  
+  }catch(err){
+    res.status(500).json({error: err.message});
+  }
+});
+
+// Delete
+app.delete('/clientdetD/:id', async(req,res)=>{
+  try{
+    const deletedData = await ClientModel.findByIdAndDelete(req.params.id);
+    if(!deletedData) return res.status(404).json({error:'Item not found'});
+    res.json({message:'Item deleted'});
+  }catch(err){
+    res.status(500).json({error: err.message});
+  }
+});
+
 
 // Start Server
 const PORT = process.env.PORT || 8080;
